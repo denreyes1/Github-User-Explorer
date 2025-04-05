@@ -15,6 +15,7 @@ import com.denreyes.githubuserexplorer.navigation.CustomNavType
 import com.denreyes.githubuserexplorer.navigation.UserDetails
 import com.denreyes.githubuserexplorer.navigation.UsersList
 import com.denreyes.githubuserexplorer.ui.FollowerScreen
+import com.denreyes.githubuserexplorer.ui.FollowingScreen
 import com.denreyes.githubuserexplorer.ui.SearchScreen
 import com.denreyes.githubuserexplorer.ui.UserDetailsScreen
 import com.denreyes.githubuserexplorer.ui.theme.GithubUserExplorerTheme
@@ -55,7 +56,9 @@ class MainActivity : ComponentActivity() {
                             onFollowerPressed = { userId ->
                                 navController.navigate("follower/$userId")
                             },
-                            onFollowingPressed = {}
+                            onFollowingPressed = { userId ->
+                                navController.navigate("following/$userId")
+                            }
                         )
                     }
                     composable(
@@ -64,6 +67,20 @@ class MainActivity : ComponentActivity() {
                         val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull()
                         if (userId != null) {
                             FollowerScreen(
+                                userId = userId,
+                                onShowDetails = { user ->
+                                    navController.navigate(UserDetails(user))
+                                },
+                                onBackPressed = { navController.popBackStack() }
+                            )
+                        }
+                    }
+                    composable(
+                        route = "following/{userId}",
+                    ) { backStackEntry ->
+                        val userId = backStackEntry.arguments?.getString("userId")?.toIntOrNull()
+                        if (userId != null) {
+                            FollowingScreen(
                                 userId = userId,
                                 onShowDetails = { user ->
                                     navController.navigate(UserDetails(user))
