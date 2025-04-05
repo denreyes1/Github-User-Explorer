@@ -8,7 +8,7 @@ class GithubRepository(
 
     suspend fun searchUser(query: String): Result<List<User>> {
         return try {
-            Result.success(service.searchUser(query).users)
+            Result.success(service.searchUser(query).items)
         } catch (e: Exception) {
             Result.failure(e)
         }

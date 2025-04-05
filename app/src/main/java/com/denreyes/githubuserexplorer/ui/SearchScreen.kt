@@ -34,11 +34,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.denreyes.githubuserexplorer.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen() {
+    val viewModel: SearchViewModel = viewModel()
     var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
 
     Scaffold(

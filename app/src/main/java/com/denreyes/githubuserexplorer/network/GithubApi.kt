@@ -4,7 +4,7 @@ import com.denreyes.githubuserexplorer.model.UserSearchResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface GithubApi {
+interface  GithubApi {
 
     @GET("search/users") // add q
     suspend fun searchUser(
