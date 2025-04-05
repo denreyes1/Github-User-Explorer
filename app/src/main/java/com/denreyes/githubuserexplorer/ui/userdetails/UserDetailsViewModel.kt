@@ -1,4 +1,4 @@
-package com.denreyes.githubuserexplorer.ui
+package com.denreyes.githubuserexplorer.ui.userdetails
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,9 +7,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class UserDetailsViewModel() : ViewModel() {
+class UserDetailsViewModel(
+    private val repository: GithubRepository
+) : ViewModel() {
     val detailsUIState = MutableStateFlow(UserDetailsUIState())
-    private val repository = GithubRepository()
 
     fun fetchUserDetails(id: Int) {
         viewModelScope.launch {

@@ -14,10 +14,10 @@ import com.denreyes.githubuserexplorer.model.User
 import com.denreyes.githubuserexplorer.navigation.CustomNavType
 import com.denreyes.githubuserexplorer.navigation.UserDetails
 import com.denreyes.githubuserexplorer.navigation.UsersList
-import com.denreyes.githubuserexplorer.ui.FollowerScreen
-import com.denreyes.githubuserexplorer.ui.FollowingScreen
-import com.denreyes.githubuserexplorer.ui.SearchScreen
-import com.denreyes.githubuserexplorer.ui.UserDetailsScreen
+import com.denreyes.githubuserexplorer.ui.followersfollowing.FollowerScreen
+import com.denreyes.githubuserexplorer.ui.followersfollowing.FollowingScreen
+import com.denreyes.githubuserexplorer.ui.search.SearchScreen
+import com.denreyes.githubuserexplorer.ui.userdetails.UserDetailsScreen
 import com.denreyes.githubuserexplorer.ui.theme.GithubUserExplorerTheme
 import kotlin.reflect.typeOf
 

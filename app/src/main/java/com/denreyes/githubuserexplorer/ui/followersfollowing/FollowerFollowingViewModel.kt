@@ -1,4 +1,4 @@
-package com.denreyes.githubuserexplorer.ui
+package com.denreyes.githubuserexplorer.ui.followersfollowing
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,14 +10,13 @@ import kotlinx.coroutines.launch
 /**
  * ViewModel for managing follower and following state.
  */
-class FollowerFollowingViewModel : ViewModel() {
+class FollowerFollowingViewModel(
+    private val repository: GithubRepository
+) : ViewModel() {
 
     // State flows to track the UI state for followers and following lists
     val followerUIState = MutableStateFlow(FollowerUIState())
     val followingUIState = MutableStateFlow(FollowingUIState())
-
-    // Repository to interact with GitHub API
-    private val repository = GithubRepository()
 
     /**
      * Fetches the followers of a user by ID and updates the UI state.

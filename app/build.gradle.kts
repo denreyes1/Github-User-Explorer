@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.retrofitConverterGson)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.coil.compose)
+    implementation(libs.bundles.koin)
 
 
     testImplementation(libs.junit)

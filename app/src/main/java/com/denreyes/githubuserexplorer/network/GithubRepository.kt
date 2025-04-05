@@ -9,7 +9,7 @@ import com.denreyes.githubuserexplorer.model.UserDetails
  * @property service An instance of [GithubApi] used to make network requests.
  */
 class GithubRepository(
-    private val service: GithubApi = ApiService.service
+    private val service: GithubApi
 ) {
 
     /**

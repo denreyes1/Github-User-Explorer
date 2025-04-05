@@ -1,4 +1,4 @@
-package com.denreyes.githubuserexplorer.ui
+package com.denreyes.githubuserexplorer.ui.userdetails
 
 import android.content.Intent
 import android.net.Uri
@@ -39,10 +39,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.denreyes.githubuserexplorer.model.User
 import com.denreyes.githubuserexplorer.model.getMockUser
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Displays detailed information about a user, including profile stats and bio.
@@ -60,7 +60,7 @@ fun UserDetailsScreen(
     onFollowerPressed: (Int) -> Unit,
     onFollowingPressed: (Int) -> Unit
 ) {
-    val viewModel: UserDetailsViewModel = viewModel()
+    val viewModel: UserDetailsViewModel = koinViewModel()
     val detailsUIState by viewModel.detailsUIState.collectAsStateWithLifecycle()
 
     // To avoid calling every recomposition

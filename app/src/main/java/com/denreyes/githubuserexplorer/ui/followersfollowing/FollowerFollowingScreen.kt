@@ -1,4 +1,4 @@
-package com.denreyes.githubuserexplorer.ui
+package com.denreyes.githubuserexplorer.ui.followersfollowing
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,6 +27,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.denreyes.githubuserexplorer.R
 import com.denreyes.githubuserexplorer.model.User
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Displays a list of followers for a given user.
@@ -42,7 +43,7 @@ fun FollowerScreen(
     onShowDetails: (user: User) -> Unit,
     onBackPressed: () -> Unit
 ) {
-    val viewModel: FollowerFollowingViewModel = viewModel()
+    val viewModel: FollowerFollowingViewModel = koinViewModel()
     val followerUIState by viewModel.followerUIState.collectAsStateWithLifecycle()
 
     // Fetch followers whenever the userId changes
@@ -93,7 +94,7 @@ fun FollowingScreen(
     onShowDetails: (user: User) -> Unit,
     onBackPressed: () -> Unit
 ) {
-    val viewModel: FollowerFollowingViewModel = viewModel()
+    val viewModel: FollowerFollowingViewModel = koinViewModel()
     val followingUIState by viewModel.followingUIState.collectAsStateWithLifecycle()
 
     // Fetch followings whenever the userId changes
