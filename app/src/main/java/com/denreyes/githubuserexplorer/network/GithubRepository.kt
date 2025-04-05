@@ -1,6 +1,7 @@
 package com.denreyes.githubuserexplorer.network
 
 import com.denreyes.githubuserexplorer.model.User
+import com.denreyes.githubuserexplorer.model.UserDetails
 
 /**
  * Repository that handles data operations for GitHub user search.
@@ -20,6 +21,20 @@ class GithubRepository(
     suspend fun searchUser(query: String): Result<List<User>> {
         return try {
             Result.success(service.searchUser(query).items)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Fetches detailed information of a GitHub user by ID.
+     *
+     * @param id The unique ID of the GitHub user.
+     * @return A [Result] containing [UserDetails] on success or an exception on failure.
+     */
+    suspend fun getUserDetails(id: Int): Result<UserDetails> {
+        return try {
+            Result.success(service.getUserDetails(id))
         } catch (e: Exception) {
             Result.failure(e)
         }

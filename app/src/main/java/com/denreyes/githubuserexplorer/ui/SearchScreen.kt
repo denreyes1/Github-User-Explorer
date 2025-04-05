@@ -1,6 +1,7 @@
 package com.denreyes.githubuserexplorer.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -34,13 +35,15 @@ import kotlinx.coroutines.flow.debounce
  * It includes:
  * - A top app bar with a search field
  * - A content area displaying loading state, search results, errors, or messages
+ *
+ * @param onShowDetails Callback to handle navigation to the details screen.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen() {
+fun SearchScreen(onShowDetails: (user: User) -> Unit) {
     val viewModel: SearchViewModel = viewModel()
     val searchUIState by viewModel.searchUIState.collectAsStateWithLifecycle()
-    var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
+    val searchQuery by viewModel.searchQuery.collectAsState()
 
     // Helper state to determine what message or content to show
     val isDefaultState = searchQuery.text.length < 3 &&
@@ -72,7 +75,7 @@ fun SearchScreen() {
                 title = {
                     SearchBar(
                         searchQuery = searchQuery,
-                        onSearchChange = { searchQuery = it }
+                        onSearchChange = viewModel::onSearchQueryChange
                     )
                 }
             )
@@ -85,7 +88,7 @@ fun SearchScreen() {
         ) {
             when {
                 searchUIState.isLoading -> LoadingIndicator()
-                searchUIState.users.isNotEmpty() -> SearchListUI(searchUIState.users)
+                searchUIState.users.isNotEmpty() -> SearchListUI(searchUIState.users, onShowDetails)
                 searchUIState.error != null -> ErrorMessage(searchUIState.error)
                 isDefaultState -> DefaultMessage()
                 isEmptyResult -> EmptyResultMessage()
@@ -154,12 +157,16 @@ private fun LoadingIndicator() {
  * Composable that shows the list of user search results.
  *
  * @param users List of GitHub users.
+ * @param onShowDetails Callback to handle navigation to the details screen.
  */
 @Composable
-private fun SearchListUI(users: List<User>) {
+private fun SearchListUI(
+    users: List<User>,
+    onShowDetails: (user: User) -> Unit
+) {
     LazyColumn {
         items(users) { user ->
-            UserItemView(user)
+            UserItemView(user, onShowDetails)
         }
     }
 }
@@ -168,13 +175,18 @@ private fun SearchListUI(users: List<User>) {
  * Composable that shows a single user item with avatar and username.
  *
  * @param user A GitHub user to display.
+ * @param onShowDetails Callback to handle navigation to the details screen.
  */
 @Composable
-fun UserItemView(user: User) {
+fun UserItemView(
+    user: User,
+    onShowDetails: (user: User) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp),
+            .padding(12.dp)
+            .clickable { onShowDetails(user) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
@@ -284,5 +296,5 @@ private fun EmptyResultMessage() {
 @Preview(showBackground = true)
 @Composable
 private fun SearchScreenPreview() {
-    SearchScreen()
+    SearchScreen {}
 }
