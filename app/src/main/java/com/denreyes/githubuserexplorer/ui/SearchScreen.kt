@@ -178,7 +178,7 @@ private fun SearchListUI(
  * @param onShowDetails Callback to handle navigation to the details screen.
  */
 @Composable
-fun UserItemView(
+private fun UserItemView(
     user: User,
     onShowDetails: (user: User) -> Unit
 ) {

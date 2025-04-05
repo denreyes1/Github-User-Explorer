@@ -7,4 +7,5 @@
     <string name="search_error_subtitle">There was an error fetching that username.</string>
     <string name="search_empty_title">Empty.</string>
     <string name="search_empty_subtitle">No user found with that username.</string>
+    <string name="followers">Followers</string>
 </resources>
