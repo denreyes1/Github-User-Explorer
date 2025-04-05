@@ -3,4 +3,8 @@
     <string name="search_placeholder">Search github username</string>
     <string name="search_default_title">Find people.</string>
     <string name="search_default_subtitle">Search all of GitHub for People.</string>
+    <string name="search_error_title">Error.</string>
+    <string name="search_error_subtitle">There was an error fetching that username.</string>
+    <string name="search_empty_title">Empty.</string>
+    <string name="search_empty_subtitle">No user found with that username.</string>
 </resources>

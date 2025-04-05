@@ -2,6 +2,9 @@ package com.denreyes.githubuserexplorer.model
 
 import kotlinx.serialization.Serializable
 
+/**
+ * Model data class representing a GitHub user returned from the search API.
+ **/
 @Serializable
 data class User (
     val login: String,

@@ -4,22 +4,37 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.denreyes.githubuserexplorer.network.GithubRepository
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
 class SearchViewModel : ViewModel() {
+    val searchUIState = MutableStateFlow(SearchUIState())
     private val repository = GithubRepository()
 
-    init {
-        searchUser("denreyes")
-    }
-
-    private fun searchUser(query: String) {
+    fun searchUser(query: String) {
         viewModelScope.async {
+            searchUIState.update { it.copy(isLoading = true, error = null, users = emptyList()) }
             val result = repository.searchUser(query)
-            result.onSuccess { podcasts ->
-                // Handle Success
+            result.onSuccess { users ->
+                searchUIState.update {
+                    it.copy(isLoading = false, users = users)
+                }
             }.onFailure { exception ->
-                // Handle Error
+                searchUIState.update {
+                    it.copy(isLoading = false, error = exception.message ?: "Unknown error")
+                }
             }
         }
     }
+
+    fun clearUsers() {
+        searchUIState.update {
+            it.copy(
+                users = emptyList(),
+                error = null,
+                isLoading = false
+            )
+        }
+    }
+
 }

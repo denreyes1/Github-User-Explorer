@@ -51,10 +51,12 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinxSerializationJson)
     implementation(libs.retrofit)
     implementation(libs.retrofitConverterGson)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.coil.compose)
 
 
     testImplementation(libs.junit)
