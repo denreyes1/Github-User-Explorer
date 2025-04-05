@@ -43,7 +43,7 @@ import kotlinx.coroutines.flow.debounce
 fun SearchScreen(onShowDetails: (user: User) -> Unit) {
     val viewModel: SearchViewModel = viewModel()
     val searchUIState by viewModel.searchUIState.collectAsStateWithLifecycle()
-    var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
+    val searchQuery by viewModel.searchQuery.collectAsState()
 
     // Helper state to determine what message or content to show
     val isDefaultState = searchQuery.text.length < 3 &&
@@ -75,7 +75,7 @@ fun SearchScreen(onShowDetails: (user: User) -> Unit) {
                 title = {
                     SearchBar(
                         searchQuery = searchQuery,
-                        onSearchChange = { searchQuery = it }
+                        onSearchChange = viewModel::onSearchQueryChange
                     )
                 }
             )
