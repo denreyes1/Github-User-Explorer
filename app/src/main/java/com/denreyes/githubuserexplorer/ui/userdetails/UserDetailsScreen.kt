@@ -1,7 +1,8 @@
-package com.denreyes.githubuserexplorer.ui
+package com.denreyes.githubuserexplorer.ui.userdetails
 
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,18 +39,28 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.denreyes.githubuserexplorer.model.User
 import com.denreyes.githubuserexplorer.model.getMockUser
+import org.koin.androidx.compose.koinViewModel
 
+/**
+ * Displays detailed information about a user, including profile stats and bio.
+ *
+ * @param user The user whose details are being displayed.
+ * @param onBackPressed Function triggered when the back button is pressed.
+ * @param onFollowerPressed Function to handle follower click events, with userId as argument.
+ * @param onFollowingPressed Function to handle following click events, with userId as argument.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserDetailsScreen(
     user: User,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    onFollowerPressed: (Int) -> Unit,
+    onFollowingPressed: (Int) -> Unit
 ) {
-    val viewModel: UserDetailsViewModel = viewModel()
+    val viewModel: UserDetailsViewModel = koinViewModel()
     val detailsUIState by viewModel.detailsUIState.collectAsStateWithLifecycle()
 
     // To avoid calling every recomposition
@@ -85,7 +96,7 @@ fun UserDetailsScreen(
             }
 
             detailsUIState.user != null -> {
-                val userDetails = detailsUIState.user
+                val userDetails = detailsUIState.user!!
 
                 Column(
                     modifier = Modifier
@@ -117,8 +128,8 @@ fun UserDetailsScreen(
                                 horizontalArrangement = Arrangement.SpaceEvenly,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                ProfileStat(number = userDetails?.followers.toString(), label = "Followers")
-                                ProfileStat(number = userDetails?.following.toString(), label = "Following")
+                                ProfileStat(number = userDetails.followers.toString(), label = "Followers", userId = userDetails.id, onFollowerPressed)
+                                ProfileStat(number = userDetails.following.toString(), label = "Following", userId = userDetails.id, onFollowingPressed)
                             }
 
                             Spacer(modifier = Modifier.height(8.dp))
@@ -132,13 +143,13 @@ fun UserDetailsScreen(
 
                     // Name + Bio
                     Text(
-                        text = userDetails?.name ?: userDetails?.login!!,
+                        text = userDetails.name ?: userDetails.login,
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
                     )
-                    if (!userDetails?.bio.isNullOrBlank()) {
+                    if (!userDetails.bio.isNullOrBlank()) {
                         Text(
-                            text = userDetails?.bio!!,
+                            text = userDetails.bio,
                             fontSize = 14.sp
                         )
                     }
@@ -146,13 +157,13 @@ fun UserDetailsScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     // Company / Location / Twitter
-                    userDetails?.company?.let {
+                    userDetails.company?.let {
                         Text(text = "🏢 $it", fontSize = 14.sp)
                     }
-                    userDetails?.location?.let {
+                    userDetails.location?.let {
                         Text(text = "📍 $it", fontSize = 14.sp)
                     }
-                    userDetails?.twitter_username?.let {
+                    userDetails.twitter_username?.let {
                         Text(text = "🐦 @$it", fontSize = 14.sp)
                     }
 
@@ -175,12 +186,28 @@ fun UserDetailsScreen(
     }
 }
 
-
+/**
+ * Displays profile stats such as followers and following count.
+ *
+ * @param number The number to display.
+ * @param label A label to describe the number.
+ * @param userId The user ID associated with the stats.
+ * @param onClick The function triggered when the stat is clicked.
+ */
 @Composable
-fun ProfileStat(number: String, label: String) {
+fun ProfileStat(
+    number: String,
+    label: String,
+    userId: Int,
+    onClick: (Int) -> Unit
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(60.dp)
+        modifier = Modifier
+            .width(60.dp)
+            .clickable{
+                onClick(userId)
+            }
     ) {
         Text(
             text = number,
@@ -196,6 +223,11 @@ fun ProfileStat(number: String, label: String) {
     }
 }
 
+/**
+ * Displays a clickable chip that opens the user's GitHub profile in a browser.
+ *
+ * @param url The URL of the user's GitHub profile.
+ */
 @Composable
 fun ProfileURLChip(url: String) {
     val context = LocalContext.current
@@ -222,5 +254,5 @@ fun ProfileURLChip(url: String) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewUserDetailsScreen() {
-    UserDetailsScreen(getMockUser()) {}
+    UserDetailsScreen(getMockUser(), {}, {}, {})
 }

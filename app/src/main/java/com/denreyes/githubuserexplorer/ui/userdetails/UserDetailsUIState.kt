@@ -1,4 +1,4 @@
-package com.denreyes.githubuserexplorer.ui
+package com.denreyes.githubuserexplorer.ui.userdetails
 
 import com.denreyes.githubuserexplorer.model.UserDetails
 
