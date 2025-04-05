@@ -1,5 +1,6 @@
 package com.denreyes.githubuserexplorer.network
 
+import com.denreyes.githubuserexplorer.model.User
 import com.denreyes.githubuserexplorer.model.UserDetails
 import com.denreyes.githubuserexplorer.model.UserListResponse
 import retrofit2.http.GET
@@ -45,7 +46,7 @@ interface GithubApi {
     @GET("user/{id}/followers")
     suspend fun getUserFollowers(
         @Path("id") id: Int
-    ): UserListResponse
+    ): List<User>
 
     /**
      * Fetches following of a specific GitHub user.
@@ -57,5 +58,5 @@ interface GithubApi {
     @GET("user/{id}/following")
     suspend fun getUserFollowing(
         @Path("id") id: Int
-    ): UserListResponse
+    ): List<User>
 }

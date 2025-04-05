@@ -48,7 +48,7 @@ class GithubRepository(
      */
     suspend fun getUserFollowers(id: Int): Result<List<User>> {
         return try {
-            Result.success(service.getUserFollowers(id).items)
+            Result.success(service.getUserFollowers(id))
         } catch (e: Exception) {
             Result.failure(e)
         }
@@ -62,7 +62,7 @@ class GithubRepository(
      */
     suspend fun getUserFollowing(id: Int): Result<List<User>> {
         return try {
-            Result.success(service.getUserFollowing(id).items)
+            Result.success(service.getUserFollowing(id))
         } catch (e: Exception) {
             Result.failure(e)
         }
