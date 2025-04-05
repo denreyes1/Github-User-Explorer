@@ -9,6 +9,6 @@ package com.denreyes.githubuserexplorer.model
  *
  * @property items A list of [User] objects representing GitHub users returned from the search query.
  */
-data class UserSearchResponse(
+data class UserListResponse(
     val items: List<User>
 )

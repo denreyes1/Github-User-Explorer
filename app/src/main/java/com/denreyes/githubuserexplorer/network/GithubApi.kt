@@ -1,7 +1,7 @@
 package com.denreyes.githubuserexplorer.network
 
 import com.denreyes.githubuserexplorer.model.UserDetails
-import com.denreyes.githubuserexplorer.model.UserSearchResponse
+import com.denreyes.githubuserexplorer.model.UserListResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -21,12 +21,12 @@ interface GithubApi {
     @GET("search/users")
     suspend fun searchUser(
         @Query("q") query: String
-    ): UserSearchResponse
+    ): UserListResponse
 
     /**
      * Fetches details of a specific GitHub user.
      *
-     * Example: GET https://api.github.com/users/denreyes
+     * Example: GET https://api.github.com/user/9638030
      *
      * @param id GitHub user ID.
      */
@@ -34,4 +34,28 @@ interface GithubApi {
     suspend fun getUserDetails(
         @Path("id") id: Int
     ): UserDetails
+
+    /**
+     * Fetches followers of a specific GitHub user.
+     *
+     * Example: GET https://api.github.com/user/9638030/followers
+     *
+     * @param id GitHub user ID.
+     */
+    @GET("user/{id}/followers")
+    suspend fun getUserFollowers(
+        @Path("id") id: Int
+    ): UserListResponse
+
+    /**
+     * Fetches following of a specific GitHub user.
+     *
+     * Example: GET https://api.github.com/user/9638030/following
+     *
+     * @param id GitHub user ID.
+     */
+    @GET("user/{id}/following")
+    suspend fun getUserFollowing(
+        @Path("id") id: Int
+    ): UserListResponse
 }

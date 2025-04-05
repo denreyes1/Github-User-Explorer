@@ -39,4 +39,32 @@ class GithubRepository(
             Result.failure(e)
         }
     }
+
+    /**
+     * Fetches followers of a GitHub user by ID.
+     *
+     * @param id The unique ID of the GitHub user.
+     * @return A [Result] containing a list of [User] on success or an exception on failure.
+     */
+    suspend fun getUserFollowers(id: Int): Result<List<User>> {
+        return try {
+            Result.success(service.getUserFollowers(id).items)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Fetches following of a GitHub user by ID.
+     *
+     * @param id The unique ID of the GitHub user.
+     * @return A [Result] containing a list of [User] on success or an exception on failure.
+     */
+    suspend fun getUserFollowing(id: Int): Result<List<User>> {
+        return try {
+            Result.success(service.getUserFollowing(id).items)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
