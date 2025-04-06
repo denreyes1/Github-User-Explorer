@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
@@ -17,12 +18,15 @@ import androidx.compose.ui.graphics.Color
  * Applies a shimmer animation effect to a composable as a loading placeholder.
  *
  * @param durationMillis Duration of the shimmer animation cycle.
- * @param shimmerColor Color used for the shimmer gradient.
+ * @param shimmerColor Optional custom shimmer color. Defaults to LightGray or DarkGray based on theme.
  */
 fun Modifier.shimmerEffect(
     durationMillis: Int = 1000,
-    shimmerColor: Color = Color.LightGray.copy(alpha = 0.6f)
+    shimmerColor: Color? = null
 ): Modifier = composed {
+    val isDarkTheme = isSystemInDarkTheme()
+    val effectiveShimmerColor = shimmerColor ?: if (isDarkTheme) Color.DarkGray else Color.LightGray
+
     val transition = rememberInfiniteTransition(label = "shimmer")
     val translateAnim = transition.animateFloat(
         initialValue = 0f,
@@ -39,9 +43,9 @@ fun Modifier.shimmerEffect(
         val endX = translateAnim.value
         val brush = Brush.linearGradient(
             colors = listOf(
-                shimmerColor.copy(alpha = 0.6f),
-                shimmerColor.copy(alpha = 0.2f),
-                shimmerColor.copy(alpha = 0.6f)
+                effectiveShimmerColor.copy(alpha = 0.6f),
+                effectiveShimmerColor.copy(alpha = 0.2f),
+                effectiveShimmerColor.copy(alpha = 0.6f)
             ),
             start = Offset(startX, 0f),
             end = Offset(endX, 0f)
