@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -26,11 +25,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,7 +47,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.denreyes.githubuserexplorer.R
 import com.denreyes.githubuserexplorer.model.User
-import kotlinx.coroutines.flow.debounce
+import com.denreyes.githubuserexplorer.ui.common.shimmerEffect
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -65,29 +67,8 @@ fun SearchScreen(onShowDetails: (user: User) -> Unit) {
     val searchUIState by viewModel.searchUIState.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsState()
 
-    // Helper state to determine what message or content to show
-    val isDefaultState = searchQuery.text.length < 3 &&
-            !searchUIState.isLoading &&
-            searchUIState.users.isEmpty() &&
-            searchUIState.error == null
-
-    val isEmptyResult = searchQuery.text.length >= 3 &&
-            !searchUIState.isLoading &&
-            searchUIState.users.isEmpty() &&
-            searchUIState.error == null
-
-    // Trigger user search or clear results based on query length
-    LaunchedEffect(Unit) {
-        snapshotFlow { searchQuery.text }
-            .debounce(300)
-            .collect { query ->
-                if (query.length >= 3) {
-                    viewModel.searchUser(query)
-                } else if (query.isEmpty()) {
-                    viewModel.clearUsers()
-                }
-            }
-    }
+    val coroutineScope = rememberCoroutineScope()
+    val pullToRefreshState = rememberPullToRefreshState()
 
     Scaffold(
         topBar = {
@@ -101,17 +82,62 @@ fun SearchScreen(onShowDetails: (user: User) -> Unit) {
             )
         }
     ) { paddingValues ->
-        Box(
+        PullToRefreshBox(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
+            state = pullToRefreshState,
+            isRefreshing = searchUIState.isLoading,
+            onRefresh = {
+                coroutineScope.launch {
+                    pullToRefreshState.animateToThreshold()
+                    viewModel.refreshData()
+                    delay(1500)
+                    pullToRefreshState.animateToHidden()
+                }
+            }
         ) {
-            when {
-                searchUIState.isLoading -> LoadingIndicator()
-                searchUIState.users.isNotEmpty() -> SearchListUI(searchUIState.users, onShowDetails)
-                searchUIState.error != null -> ErrorMessage(searchUIState.error)
-                isDefaultState -> DefaultMessage()
-                isEmptyResult -> EmptyResultMessage()
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                when {
+                    searchUIState.isLoading -> {
+                        items(10) { UserItemShimmer() }
+                    }
+
+                    searchUIState.users.isNotEmpty() -> {
+                        items(searchUIState.users) { user ->
+                            UserItemView(user, onShowDetails)
+                        }
+                    }
+
+                    searchUIState.error != null -> item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ErrorMessage(searchUIState.error)
+                        }
+                    }
+
+                    searchQuery.text.length < 3 -> item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            DefaultMessage()
+                        }
+                    }
+
+                    else -> item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            EmptyResultMessage()
+                        }
+                    }
+                }
             }
         }
     }
@@ -148,45 +174,15 @@ private fun SearchBar(
                     )
                 },
                 singleLine = true,
-                colors = TextFieldDefaults.textFieldColors(
-                    containerColor = Color.Transparent,
-                    cursorColor = Color.White,
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.Transparent,
+                    unfocusedContainerColor = Color.Transparent,
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
+                    unfocusedIndicatorColor = Color.Transparent,
+                    cursorColor = Color.White
                 ),
                 modifier = Modifier.fillMaxWidth()
             )
-        }
-    }
-}
-
-/**
- * Composable that shows a loading spinner.
- */
-@Composable
-private fun LoadingIndicator() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
-/**
- * Composable that shows the list of user search results.
- *
- * @param users List of GitHub users.
- * @param onShowDetails Callback to handle navigation to the details screen.
- */
-@Composable
-private fun SearchListUI(
-    users: List<User>,
-    onShowDetails: (user: User) -> Unit
-) {
-    LazyColumn {
-        items(users) { user ->
-            UserItemView(user, onShowDetails)
         }
     }
 }
@@ -224,6 +220,45 @@ private fun UserItemView(
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold
         )
+    }
+}
+
+/**
+ * Composable that shows a shimmer placeholder for a user list item.
+ */
+@Composable
+private fun UserItemShimmer() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surface)
+                .shimmerEffect()
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Box(
+                modifier = Modifier
+                    .height(16.dp)
+                    .fillMaxWidth(0.5f)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .shimmerEffect()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .height(14.dp)
+                    .fillMaxWidth(0.3f)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .shimmerEffect()
+            )
+        }
     }
 }
 
