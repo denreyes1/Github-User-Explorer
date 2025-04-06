@@ -9,4 +9,8 @@
     <string name="search_empty_subtitle">No user found with that username.</string>
     <string name="followers">Followers</string>
     <string name="following">Following</string>
+    <string name="company">Company</string>
+    <string name="location">Location</string>
+    <string name="profile_picture">Profile Picture</string>
+    <string name="twitter_x">Twitter X</string>
 </resources>
