@@ -99,8 +99,7 @@ fun SearchScreen(onShowDetails: (user: User) -> Unit) {
             }
         ) {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
                 when {
                     searchUIState.isLoading -> item {
