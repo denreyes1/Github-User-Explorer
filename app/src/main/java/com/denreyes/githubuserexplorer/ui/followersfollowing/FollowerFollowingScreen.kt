@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,6 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.denreyes.githubuserexplorer.R
 import com.denreyes.githubuserexplorer.model.User
+import com.denreyes.githubuserexplorer.ui.common.shimmerEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -102,17 +102,10 @@ fun FollowerScreen(
                 }
             }
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
                 when {
-                    followerUIState.isLoading -> item {
-                        Box(
-                            modifier = Modifier.fillParentMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            LoadingIndicator()
-                        }
+                    followerUIState.isLoading -> items(10) {
+                        UserItemShimmer()
                     }
                     followerUIState.users.isNotEmpty() -> items(followerUIState.users) { user ->
                         UserItemView(user, onShowDetails)
@@ -128,7 +121,6 @@ fun FollowerScreen(
                 }
             }
         }
-
     }
 }
 
@@ -180,23 +172,16 @@ fun FollowingScreen(
             onRefresh = {
                 coroutineScope.launch {
                     pullToRefreshState.animateToThreshold()
-                    viewModel.fetchFollowers(userId)
+                    viewModel.fetchFollowing(userId)
                     delay(1000)
                     pullToRefreshState.animateToHidden()
                 }
             }
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
                 when {
-                    followingUIState.isLoading -> item {
-                        Box(
-                            modifier = Modifier.fillParentMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            LoadingIndicator()
-                        }
+                    followingUIState.isLoading -> items(10) {
+                        UserItemShimmer()
                     }
                     followingUIState.users.isNotEmpty() -> items(followingUIState.users) { user ->
                         UserItemView(user, onShowDetails)
@@ -212,37 +197,44 @@ fun FollowingScreen(
                 }
             }
         }
-
     }
 }
 
 /**
- * Composable that shows a loading spinner.
+ * Composable that shows a shimmer placeholder for a user list item.
  */
 @Composable
-private fun LoadingIndicator() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+private fun UserItemShimmer() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
     ) {
-        CircularProgressIndicator()
-    }
-}
-
-/**
- * Composable that shows the list of users.
- *
- * @param users List of GitHub users.
- * @param onShowDetails Callback to handle navigation to the details screen.
- */
-@Composable
-private fun FollowerListUI(
-    users: List<User>,
-    onShowDetails: (user: User) -> Unit
-) {
-    LazyColumn {
-        items(users) { user ->
-            UserItemView(user, onShowDetails)
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surface)
+                .shimmerEffect()
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Box(
+                modifier = Modifier
+                    .height(16.dp)
+                    .fillMaxWidth(0.5f)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .shimmerEffect()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .height(14.dp)
+                    .fillMaxWidth(0.3f)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .shimmerEffect()
+            )
         }
     }
 }
