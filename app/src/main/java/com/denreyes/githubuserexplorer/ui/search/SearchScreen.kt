@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.denreyes.githubuserexplorer.R
 import com.denreyes.githubuserexplorer.model.User
+import com.denreyes.githubuserexplorer.ui.common.shimmerEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -82,7 +82,6 @@ fun SearchScreen(onShowDetails: (user: User) -> Unit) {
             )
         }
     ) { paddingValues ->
-
         PullToRefreshBox(
             modifier = Modifier
                 .fillMaxSize()
@@ -93,7 +92,7 @@ fun SearchScreen(onShowDetails: (user: User) -> Unit) {
                 coroutineScope.launch {
                     pullToRefreshState.animateToThreshold()
                     viewModel.refreshData()
-                    delay(1500) // Simulate network delay
+                    delay(1500)
                     pullToRefreshState.animateToHidden()
                 }
             }
@@ -102,17 +101,14 @@ fun SearchScreen(onShowDetails: (user: User) -> Unit) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 when {
-                    searchUIState.isLoading -> item {
-                        Box(
-                            modifier = Modifier.fillParentMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            LoadingIndicator()
-                        }
+                    searchUIState.isLoading -> {
+                        items(10) { UserItemShimmer() }
                     }
 
-                    searchUIState.users.isNotEmpty() -> items(searchUIState.users) { user ->
-                        UserItemView(user, onShowDetails)
+                    searchUIState.users.isNotEmpty() -> {
+                        items(searchUIState.users) { user ->
+                            UserItemView(user, onShowDetails)
+                        }
                     }
 
                     searchUIState.error != null -> item {
@@ -192,37 +188,6 @@ private fun SearchBar(
 }
 
 /**
- * Composable that shows a loading spinner.
- */
-@Composable
-private fun LoadingIndicator() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
-/**
- * Composable that shows the list of user search results.
- *
- * @param users List of GitHub users.
- * @param onShowDetails Callback to handle navigation to the details screen.
- */
-@Composable
-private fun SearchListUI(
-    users: List<User>,
-    onShowDetails: (user: User) -> Unit
-) {
-    LazyColumn {
-        items(users) { user ->
-            UserItemView(user, onShowDetails)
-        }
-    }
-}
-
-/**
  * Composable that shows a single user item with avatar and username.
  *
  * @param user A GitHub user to display.
@@ -255,6 +220,45 @@ private fun UserItemView(
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold
         )
+    }
+}
+
+/**
+ * Composable that shows a shimmer placeholder for a user list item.
+ */
+@Composable
+private fun UserItemShimmer() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surface)
+                .shimmerEffect()
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Box(
+                modifier = Modifier
+                    .height(16.dp)
+                    .fillMaxWidth(0.5f)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .shimmerEffect()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .height(14.dp)
+                    .fillMaxWidth(0.3f)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .shimmerEffect()
+            )
+        }
     }
 }
 

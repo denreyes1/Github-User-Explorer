@@ -21,10 +21,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.AssistChip
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -48,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.denreyes.githubuserexplorer.model.User
 import com.denreyes.githubuserexplorer.model.getMockUser
+import com.denreyes.githubuserexplorer.ui.common.shimmerEffect
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -110,12 +111,7 @@ fun UserDetailsScreen(
         ) {
             when {
                 detailsUIState.isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
+                    UserDetailsShimmer()
                 }
 
                 detailsUIState.user != null -> {
@@ -215,6 +211,94 @@ fun UserDetailsScreen(
     }
 }
 
+@Composable
+private fun UserDetailsShimmer() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .shimmerEffect()
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    repeat(2) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.width(60.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .height(20.dp)
+                                    .width(40.dp)
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .shimmerEffect()
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Box(
+                                modifier = Modifier
+                                    .height(14.dp)
+                                    .width(40.dp)
+                                    .background(MaterialTheme.colorScheme.surface)
+                                    .shimmerEffect()
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(32.dp)
+                        .background(MaterialTheme.colorScheme.surface)
+                        .shimmerEffect()
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Box(
+            modifier = Modifier
+                .height(20.dp)
+                .fillMaxWidth(0.5f)
+                .background(MaterialTheme.colorScheme.surface)
+                .shimmerEffect()
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        repeat(3) {
+            Spacer(modifier = Modifier.height(6.dp))
+            Box(
+                modifier = Modifier
+                    .height(14.dp)
+                    .fillMaxWidth(0.8f)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .shimmerEffect()
+            )
+        }
+    }
+}
+
 /**
  * Displays profile stats such as followers and following count.
  *
@@ -224,7 +308,7 @@ fun UserDetailsScreen(
  * @param onClick The function triggered when the stat is clicked.
  */
 @Composable
-fun ProfileStat(
+private fun ProfileStat(
     number: String,
     label: String,
     userId: Int,
@@ -258,7 +342,7 @@ fun ProfileStat(
  * @param url The URL of the user's GitHub profile.
  */
 @Composable
-fun ProfileURLChip(url: String) {
+private fun ProfileURLChip(url: String) {
     val context = LocalContext.current
 
     AssistChip(

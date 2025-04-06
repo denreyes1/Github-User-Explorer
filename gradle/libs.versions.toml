@@ -17,6 +17,7 @@ koin = "3.5.3"
 koinCompose = "3.5.3"
 composeMaterial = "1.7.8"
 material3 = "1.3.1"
+accompanist = "0.30.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,6 +44,7 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref="coil" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-android-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koinCompose" }
+accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref="accompanist" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
